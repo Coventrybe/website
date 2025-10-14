@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coventry | The Web, thoughtfully.</title>
+    <style>
+        :root {
+            --bg-color: #0e0e0e;
+            --text-color: #f5f5f5;
+            --cite-color: #888;
+            --footer-color: #444;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f5f5f5;
+            --text-color: #0e0e0e;
+            --cite-color: #555;
+            --footer-color: #888;
+        }
+
+        html, body {
+            margin: 0;
+            height: 100%;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            overflow: hidden;
+            transition: background 0.5s, color 0.5s;
+        }
+
+        blockquote {
+            font-size: 1.6rem;
+            max-width: 700px;
+            line-height: 1.6;
+            margin: 0 auto 1rem;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+
+        cite {
+            color: var(--cite-color);
+            font-size: 1rem;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out, color 0.5s;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 1rem;
+            color: var(--footer-color);
+            font-size: 0.8rem;
+            transition: color 0.5s;
+        }
+
+        .theme-switch {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+        }
+
+        .switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #555;
+            border-radius: 30px;
+            transition: background 0.5s;
+        }
+
+        .switch-knob {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--bg-color);
+            transition: transform 0.5s, background 0.5s, color 0.5s;
+        }
+
+        [data-theme="light"] .switch {
+            background: #ddd;
+        }
+
+        [data-theme="light"] .switch-knob {
+            transform: translateX(30px);
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+    </style>
+</head>
+<body>
+<div class="theme-switch" id="theme-toggle" title="">
+    <div class="switch">
+        <div class="switch-knob" id="switch-knob">🌙</div>
+    </div>
+</div>
+
+<main>
+    <blockquote id="quote"></blockquote>
+    <cite id="author"></cite>
+</main>
+
+<footer>
+    Building a safer, accessible, and meaningful web for all.
+</footer>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+
+
+    const quotes = [
+      { text: "Design is not just what it looks like and feels like. Design is how it works.", author: "Steve Jobs" },
+      { text: "Simplicity is the ultimate sophistication.", author: "Leonardo da Vinci" },
+      { text: "The details are not the details. They make the design.", author: "Charles Eames" },
+      { text: "Good design is obvious. Great design is transparent.", author: "Joe Sparano" },
+      { text: "Less is more.", author: "Ludwig Mies van der Rohe" },
+      { text: "Design is the silent ambassador of your brand.", author: "Paul Rand" },
+      { text: "Design is thinking made visual.", author: "Saul Bass" },
+      { text: "Design isn’t finished until somebody is using it.", author: "Brenda Laurel" },
+      { text: "The next big thing is the one that makes the last big thing usable.", author: "Blake Ross" },
+      { text: "Very often, design is the most immediate way of defining what products become in people’s minds.", author: "Jony Ive" },
+      { text: "People ignore design that ignores people.", author: "Frank Chimero" },
+      { text: "UI is the saddle, the stirrups, & the reins. UX is the feeling you get being able to ride the horse.", author: "Dain Miller" },
+      { text: "The role of the designer is that of a good, thoughtful host anticipating the needs of his guests.", author: "Charles Eames" },
+      { text: "Design adds value faster than it adds costs.", author: "Joel Spolsky" },
+      { text: "It’s not about pixels, it’s about people.", author: null },
+      { text: "The Web does not just connect machines, it connects people.", author: "Tim Berners-Lee" },
+      { text: "Information wants to be free.", author: "Stewart Brand" },
+      { text: "The power of the web is in its universality. Access by everyone regardless of disability is an essential aspect.", author: "Tim Berners-Lee" },
+      { text: "Privacy is not something that I’m merely entitled to, it’s an absolute prerequisite.", author: "Marlon Brando" },
+      { text: "The web should empower, not exploit.", author: null },
+      { text: "Security is not a product, but a process.", author: "Bruce Schneier" },
+      { text: "Arguing that you don’t care about privacy because you have nothing to hide is like saying you don’t care about free speech because you have nothing to say.", author: "Edward Snowden" },
+      { text: "The goal of the web is to help people do what they want — not what companies want them to do.", author: "Jeff Hammerbacher" },
+      { text: "The web is more a social creation than a technical one. I designed it for a social effect — to help people work together — and not as a technical toy.", author: "Tim Berners-Lee" },
+      { text: "Design for privacy by default. Don’t make people hunt for their rights.", author: "Luke Wroblewski" },
+      { text: "Trust and privacy are the currency of the digital age.", author: null },
+      { text: "The web should be a level playing field, not a walled garden controlled by a few companies.", author: "Vint Cerf" },
+      { text: "Cybersecurity is much more than a matter of IT. It’s a matter of organizational culture and human behavior.", author: null },
+      { text: "Without privacy, there is no freedom.", author: null },
+      { text: "A secure system is one where the user feels safe, even if they don’t understand all the details.", author: "Bruce Schneier" },
+      { text: "Accessibility allows us to tap into everyone’s potential.", author: "Debra Ruh" },
+      { text: "You can’t understand good design if you do not understand people.", author: "Dieter Rams" },
+      { text: "Accessibility is not a feature, it’s a social trend.", author: "Antonio Santos" },
+      { text: "Make it simple, but significant.", author: "Don Draper" },
+      { text: "Good UX is when the user doesn’t even notice the design.", author: "Jared Spool" },
+      { text: "Design for the web should respect its medium, not mimic paper.", author: "Jeffrey Zeldman" },
+      { text: "If you think good design is expensive, you should look at the cost of bad design.", author: "Ralf Speth" },
+      { text: "Nothing is more important than human-centered design.", author: "Tim Brown" },
+      { text: "The user experience is the sum of all interactions.", author: "Jesse James Garrett" },
+      { text: "Every great design begins with an even better story.", author: "Lorinda Mamo" },
+      { text: "Empathy is the starting point for creating a community and taking action.", author: "Jane Chen" },
+      { text: "Design is intelligence made visible.", author: "Alina Wheeler" },
+      { text: "Security is always too much until it’s not enough.", author: null },
+      { text: "Privacy is a fundamental human right.", author: "Tim Berners-Lee" },
+      { text: "The internet is a tool for freedom, not control.", author: "Vint Cerf" },
+      { text: "The most secure system is the one the user trusts and understands.", author: "Bruce Schneier" },
+      { text: "Ethical design is not a choice; it is a responsibility.", author: "Tristan Harris" },
+      { text: "Data is a precious thing and will last longer than the systems themselves.", author: "Tim Berners-Lee" },
+      { text: "An insecure system is like leaving your front door wide open.", author: null },
+      { text: "Transparency is the foundation of trust.", author: null },
+      { text: "Design with privacy in mind, always.", author: "Luke Wroblewski" },
+      { text: "The web should be a platform for innovation, not exploitation.", author: "Vint Cerf" },
+      { text: "Security is a process, not a product.", author: "Bruce Schneier" },
+      { text: "Without respect for privacy, there is no digital freedom.", author: "Edward Snowden" },
+      { text: "Good design empowers the user, bad design manipulates them.", author: "Don Norman" },
+      { text: "The web is a public space; treat it like a civic space.", author: "Tim Berners-Lee" },
+      { text: "Ethical software design is about making choices that respect people.", author: null },
+      { text: "The Web is more a social creation than a technical one.", author: "Tim Berners-Lee" },
+      { text: "The real problem is not whether machines think but whether men do.", author: "B.F. Skinner" },
+      { text: "Privacy is not an option, and it shouldn’t be the price we accept for just getting on the Internet.", author: "Gary Kovacs" },
+      { text: "The best security is the one that the user doesn’t notice but can rely on.", author: "Bruce Schneier" },
+      { text: "Ethics is knowing the difference between what you have a right to do and what is right to do.", author: "Potter Stewart" },
+      { text: "The Web should be open, safe, and empowering.", author: "Vint Cerf" },
+      { text: "Security is never perfect. It’s a continuous process.", author: "Gene Spafford" },
+      { text: "The cost of bad design far outweighs the cost of good design.", author: "Norman Foster" },
+      { text: "The Web’s power lies in its universality. Everyone can participate.", author: "Tim Berners-Lee" },
+      { text: "People often forget that security is a human problem, not just a technical one.", author: "Bruce Schneier" },
+      { text: "Without privacy, there is no freedom.", author: "Edward Snowden" },
+      { text: "Transparency and ethics are the foundations of trust in the digital age.", author: null },
+      { text: "A good system is one that people trust without knowing everything about it.", author: "Bruce Schneier" },
+      { text: "The Web is a mirror of society. Make it reflect the best of humanity.", author: null },
+      { text: "Security is not about being paranoid; it’s about being responsible.", author: null },
+      { text: "Design is about making things good (and then better) for people.", author: null },
+      { text: "Good UX is when the user doesn’t notice the interface, only the experience.", author: "Jared Spool" },
+      { text: "Designing for accessibility is designing for everyone.", author: "Derek Featherstone" },
+      { text: "Human-centered design starts with empathy.", author: "IDEO" },
+      { text: "The user experience is not a department, it’s a mindset.", author: null },
+      { text: "Accessibility is an opportunity, not a limitation.", author: "Sharron Rush" },
+      { text: "Every design decision has an impact on real people.", author: "Don Norman" },
+      { text: "Design for humans first, devices second.", author: null },
+      { text: "Empathy is the engine of human-centered design.", author: "Jane Chen" },
+      { text: "The best design is invisible, intuitive, and inclusive.", author: null }
+    ];
+
+    const quoteEl = document.getElementById("quote");
+    const authorEl = document.getElementById("author");
+    const toggle = document.getElementById("theme-toggle");
+    const knob = document.getElementById("switch-knob");
+
+    function setQuote() {
+      const { text, author } = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteEl.style.opacity = 0;
+      authorEl.style.opacity = 0;
+
+      setTimeout(() => {
+        quoteEl.textContent = `"${text}"`;
+        if (author) {
+          authorEl.textContent = `— ${author}`;
+          authorEl.style.display = "block";
+        } else {
+          authorEl.style.display = "none";
+        }
+        quoteEl.style.opacity = 1;
+        authorEl.style.opacity = author ? 1 : 0;
+      }, 800);
+    }
+
+
+    setQuote();
+    setInterval(setQuote, 10000);
+
+    // Theme application with hover title
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      knob.textContent = theme === "dark" ? "🌙" : "☀️";
+      toggle.title = theme === "dark" ? "Turn the lights on" : "Turn the lights off";
+    }
+
+    const storedTheme = localStorage.getItem("theme");
+    if (storedTheme) {
+      applyTheme(storedTheme);
+    } else {
+      const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      applyTheme(systemPrefersDark ? "dark" : "light");
+    }
+
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
+      if (!localStorage.getItem("theme")) {
+        applyTheme(e.matches ? "dark" : "light");
+      }
+    });
+
+    toggle.addEventListener("click", () => {
+      const currentTheme = document.documentElement.getAttribute("data-theme");
+      const newTheme = currentTheme === "dark" ? "light" : "dark";
+      applyTheme(newTheme);
+      localStorage.setItem("theme", newTheme);
+    });
+  });
+</script>
+</body>
+</html>
